@@ -17,88 +17,80 @@ export default function AuthHeader({
 }: AuthHeaderProps) {
   const { user, logout, isAuthenticated } = useAuth();
 
-  const getRoleColor = (role: UserRole) => {
-    return role === 'ADMIN' ? '#7F55B1' : '#9B7EBD';
+  const getRoleGradient = (role: UserRole) => {
+    return role === 'ADMIN' 
+      ? 'linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)' 
+      : 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)';
   };
 
   const getRoleDisplayName = (role: UserRole) => {
-    return role === 'ADMIN' ? 'Administrator' : 'Cashier';
+    return role === 'ADMIN' ? 'Admin' : 'Cashier';
   };
 
   return (
-    <header className="bg-white shadow-sm border-b-2" style={{borderColor: '#F49BAB'}}>
-      <div className="max-w-full mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo and Title */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{backgroundColor: '#7F55B1'}}>
-              <span className="text-white text-lg font-bold">P</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold" style={{color: '#7F55B1'}}>{title}</h1>
-              <p className="text-sm" style={{color: '#9B7EBD'}}>{subtitle}</p>
-            </div>
-          </Link>
+    <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-between h-16">
+          {/* Left Side - Title and Subtitle */}
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                <span className="text-white text-sm font-bold">P</span>
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-800">
+                  {title}
+                </h1>
+                <p className="text-xs text-gray-500">{subtitle}</p>
+              </div>
+            </Link>
+          </div>
 
-          {/* Navigation Links (if user is authenticated) */}
+          {/* Center Navigation */}
           {isAuthenticated && showNavigation && (
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="hidden md:flex items-center space-x-8">
               <Link 
                 href="/" 
-                className="text-sm font-medium hover:underline transition-all duration-200" 
-                style={{color: '#9B7EBD'}}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
               >
-                Home
+                <span>🏠</span>
+                <span>Home</span>
               </Link>
               <Link 
                 href="/pos" 
-                className="text-sm font-medium hover:underline transition-all duration-200" 
-                style={{color: '#9B7EBD'}}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
               >
-                POS System
+                <span>🛒</span>
+                <span>POS</span>
               </Link>
               {user?.role === 'ADMIN' && (
                 <Link 
                   href="/admin" 
-                  className="text-sm font-medium hover:underline transition-all duration-200" 
-                  style={{color: '#9B7EBD'}}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
                 >
-                  Admin Panel
+                  <span>📊</span>
+                  <span>Admin</span>
                 </Link>
               )}
             </nav>
           )}
 
-          {/* User Info and Logout */}
+          {/* Right Side - User Info */}
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-4">
-              {/* User Info */}
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium" style={{color: '#7F55B1'}}>
-                  {user.name || user.email}
-                </p>
-                <div className="flex items-center justify-end space-x-2">
-                  <span 
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor: getRoleColor(user.role),
-                      color: 'white'
-                    }}
-                  >
-                    {getRoleDisplayName(user.role)}
-                  </span>
+              <div className="hidden sm:flex items-center space-x-3">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-700">
+                    {user.name || user.email}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {getRoleDisplayName(user.role)} • Active
+                  </p>
                 </div>
               </div>
-
-              {/* Logout Button */}
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl border-2 text-sm font-medium hover:shadow-md transition-all duration-200"
-                style={{
-                  borderColor: '#F49BAB',
-                  color: '#7F55B1',
-                  backgroundColor: 'transparent'
-                }}
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-all duration-200"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -109,12 +101,8 @@ export default function AuthHeader({
           ) : (
             <Link
               href="/login"
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-white transition-all duration-200 hover:shadow-lg"
-              style={{backgroundColor: '#7F55B1'}}
+              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-all duration-200"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
               <span>Login</span>
             </Link>
           )}
@@ -122,33 +110,33 @@ export default function AuthHeader({
 
         {/* Mobile Navigation */}
         {isAuthenticated && showNavigation && (
-          <nav className="md:hidden mt-4 pt-4 border-t" style={{borderColor: '#F49BAB'}}>
-            <div className="flex space-x-6">
+          <div className="md:hidden border-t border-gray-200 py-3">
+            <nav className="flex justify-center space-x-6">
               <Link 
                 href="/" 
-                className="text-sm font-medium hover:underline transition-all duration-200" 
-                style={{color: '#9B7EBD'}}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
               >
-                Home
+                <span>🏠</span>
+                <span>Home</span>
               </Link>
               <Link 
                 href="/pos" 
-                className="text-sm font-medium hover:underline transition-all duration-200" 
-                style={{color: '#9B7EBD'}}
+                className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
               >
-                POS
+                <span>🛒</span>
+                <span>POS</span>
               </Link>
               {user?.role === 'ADMIN' && (
                 <Link 
                   href="/admin" 
-                  className="text-sm font-medium hover:underline transition-all duration-200" 
-                  style={{color: '#9B7EBD'}}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-md hover:bg-purple-50 transition-all duration-200"
                 >
-                  Admin
+                  <span>📊</span>
+                  <span>Admin</span>
                 </Link>
               )}
-            </div>
-          </nav>
+            </nav>
+          </div>
         )}
       </div>
     </header>

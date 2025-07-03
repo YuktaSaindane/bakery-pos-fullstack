@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { Product, PRODUCT_CATEGORIES } from '@/types';
 import { productsApi } from '@/lib/api';
@@ -29,6 +29,23 @@ const initialFormData: ProductFormData = {
   isActive: true
 };
 
+// Custom hook for debounced search
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +57,9 @@ export default function AdminPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [activeTab, setActiveTab] = useState('products');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Debounce search query for better performance
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Load products
   useEffect(() => {
@@ -61,13 +81,28 @@ export default function AdminPage() {
     }
   };
 
-  // Filter products
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Memoized filtered products for better performance
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                           product.category.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, debouncedSearchQuery, selectedCategory]);
+
+  // Optimistic update helper
+  const updateProductInState = useCallback((updatedProduct: Product) => {
+    setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+  }, []);
+
+  const addProductToState = useCallback((newProduct: Product) => {
+    setProducts(prev => [...prev, newProduct]);
+  }, []);
+
+  const removeProductFromState = useCallback((productId: string) => {
+    setProducts(prev => prev.filter(p => p.id !== productId));
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,57 +113,70 @@ export default function AdminPage() {
       return;
     }
 
-    try {
+    const submitPromise = async () => {
       setSubmitting(true);
       
-      if (editingProduct) {
-        // Update existing product
-        const response = await productsApi.update(editingProduct.id, formData);
-        if (response.success) {
-          await loadProducts();
-          closeModal();
-          toast.success(`"${formData.name}" has been updated successfully!`);
+      try {
+        if (editingProduct) {
+          // Update existing product
+          const response = await productsApi.update(editingProduct.id, formData);
+          if (response.success) {
+            updateProductInState(response.data);
+            closeModal();
+            return response.data;
+          } else {
+            throw new Error('Failed to update the product');
+          }
         } else {
-          toast.error('Failed to update the product. Please try again.');
+          // Create new product
+          const response = await productsApi.create(formData);
+          if (response.success) {
+            addProductToState(response.data);
+            closeModal();
+            return response.data;
+          } else {
+            throw new Error('Failed to create the product');
+          }
         }
-      } else {
-        // Create new product
-        const response = await productsApi.create(formData);
-        if (response.success) {
-          await loadProducts();
-          closeModal();
-          toast.success(`"${formData.name}" has been added to your menu!`);
-        } else {
-          toast.error('Failed to create the product. Please try again.');
-        }
+      } finally {
+        setSubmitting(false);
       }
-    } catch (error) {
-      console.error('Error submitting product:', error);
-      toast.error('An error occurred while saving the product.');
-    } finally {
-      setSubmitting(false);
-    }
+    };
+
+    toast.promise(
+      submitPromise(),
+      {
+        loading: editingProduct ? `Updating "${formData.name}"...` : `Adding "${formData.name}" to your menu...`,
+        success: (data) => `"${data.name}" has been ${editingProduct ? 'updated' : 'added'} successfully!`,
+        error: (err) => err.message || 'An error occurred while saving the product.',
+      }
+    );
   };
 
-  // Handle delete
+  // Handle delete with proper toast management
   const handleDelete = async (product: Product) => {
     if (!confirm(`Are you sure you want to delete "${product.name}"?`)) {
       return;
     }
 
-    try {
-      toast.loading(`Removing "${product.name}" from your menu...`);
+    const deletePromise = async () => {
       const response = await productsApi.delete(product.id);
       if (response.success) {
-        await loadProducts();
-        toast.success(`"${product.name}" has been removed from your menu!`);
+        removeProductFromState(product.id);
+        return product;
       } else {
-        toast.error('Failed to delete the product. Please try again.');
+        throw new Error('Failed to delete the product');
       }
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      toast.error('An error occurred while deleting the product.');
-    }
+    };
+
+    toast.promise(
+      deletePromise(),
+      {
+        loading: `Removing "${product.name}" from your menu...`,
+        success: (deletedProduct) => `"${deletedProduct.name}" has been removed from your menu!`,
+        error: (err) => err.message || 'An error occurred while deleting the product.',
+      }
+    );
   };
 
   // Modal functions
@@ -203,24 +251,23 @@ export default function AdminPage() {
           {activeTab === 'products' && (
             <>
               {/* Mobile Add Product Button + Controls */}
-              <div className="bg-white rounded-2xl shadow-sm border-2 p-4 sm:p-6 mb-4 sm:mb-6" style={{borderColor: '#F49BAB'}}>
-                <div className="flex flex-col gap-4">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-200 p-3 sm:p-4 mb-4">
+                <div className="flex flex-col gap-3">
                   {/* Add Product Button */}
                   <div className="flex justify-between items-center">
-                    <h2 className="text-lg sm:text-xl font-bold" style={{color: '#7F55B1'}}>
+                    <h2 className="text-lg font-bold text-purple-700">
                       Product Management
                     </h2>
                     <button
                       onClick={openAddModal}
-                      className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-white font-semibold active:scale-95 transition-all duration-200 shadow-lg text-sm sm:text-base"
-                      style={{backgroundColor: '#7F55B1'}}
+                      className="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium active:scale-95 transition-all duration-200 shadow-sm hover:bg-purple-700 text-sm"
                     >
                       + Add Product
                     </button>
                   </div>
 
                   {/* Search and Filters */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     {/* Search Bar */}
                     <div className="relative">
                       <input
@@ -228,30 +275,21 @@ export default function AdminPage() {
                         placeholder="Search products..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 sm:py-4 text-base border-2 rounded-xl focus:ring-2 focus:border-transparent transition-all"
-                        style={{
-                          borderColor: '#F49BAB',
-                          '--tw-ring-color': '#9B7EBD'
-                        }}
+                        className="w-full pl-10 pr-4 py-2.5 text-sm border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white/70 backdrop-blur-sm"
                       />
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2" style={{color: '#9B7EBD'}}>
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       </div>
                     </div>
 
                     {/* Category Filter + View Mode */}
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="flex-1 px-4 py-3 sm:py-4 text-base border-2 rounded-xl focus:ring-2 focus:border-transparent bg-white transition-all"
-                        style={{
-                          borderColor: '#F49BAB',
-                          '--tw-ring-color': '#9B7EBD',
-                          color: '#7F55B1'
-                        }}
+                        className="flex-1 px-3 py-2.5 text-sm border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white/70 backdrop-blur-sm text-purple-700"
                       >
                         <option value="all">All Categories</option>
                         {PRODUCT_CATEGORIES.map(category => (
@@ -260,22 +298,20 @@ export default function AdminPage() {
                       </select>
 
                       {/* View Mode Toggle */}
-                      <div className="flex rounded-xl border-2 overflow-hidden" style={{borderColor: '#F49BAB'}}>
+                      <div className="flex rounded-lg border border-purple-200 overflow-hidden bg-white/70">
                         <button
                           onClick={() => setViewMode('grid')}
-                          className={`px-3 sm:px-4 py-3 sm:py-4 transition-all ${viewMode === 'grid' ? 'text-white' : 'text-gray-600'}`}
-                          style={{backgroundColor: viewMode === 'grid' ? '#7F55B1' : 'white'}}
+                          className={`px-3 py-2.5 transition-all ${viewMode === 'grid' ? 'bg-purple-600 text-white' : 'text-purple-600 hover:bg-purple-50'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                           </svg>
                         </button>
                         <button
                           onClick={() => setViewMode('list')}
-                          className={`px-3 sm:px-4 py-3 sm:py-4 transition-all ${viewMode === 'list' ? 'text-white' : 'text-gray-600'}`}
-                          style={{backgroundColor: viewMode === 'list' ? '#7F55B1' : 'white'}}
+                          className={`px-3 py-2.5 transition-all ${viewMode === 'list' ? 'bg-purple-600 text-white' : 'text-purple-600 hover:bg-purple-50'}`}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                           </svg>
                         </button>
@@ -286,100 +322,97 @@ export default function AdminPage() {
               </div>
 
               {/* Products Grid/List */}
-              <div className="bg-white rounded-2xl shadow-sm border-2 p-4 sm:p-6" style={{borderColor: '#F49BAB'}}>
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-200 p-3 sm:p-4">
                 {loading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-transparent" style={{borderTopColor: '#7F55B1'}}></div>
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
                   </div>
                 ) : filteredProducts.length === 0 ? (
-                  <div className="text-center py-20">
-                    <div className="text-6xl sm:text-8xl mb-4">📦</div>
-                    <p className="text-xl sm:text-2xl font-bold" style={{color: '#9B7EBD'}}>No products found</p>
+                  <div className="text-center py-12">
+                    <div className="text-4xl mb-3">📦</div>
+                    <p className="text-lg font-semibold text-gray-600">No products found</p>
                     <button
                       onClick={openAddModal}
-                      className="mt-4 px-6 py-3 rounded-xl text-white font-semibold active:scale-95 transition-all duration-200 shadow-lg"
-                      style={{backgroundColor: '#7F55B1'}}
+                      className="mt-3 px-4 py-2 rounded-lg bg-purple-600 text-white font-medium active:scale-95 transition-all duration-200 shadow-sm hover:bg-purple-700"
                     >
                       Add Your First Product
                     </button>
                   </div>
                 ) : (
                   <div className={viewMode === 'grid' 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" 
-                    : "space-y-3"
+                    ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" 
+                    : "space-y-2"
                   }>
                     {filteredProducts.map(product => (
                       <div 
                         key={product.id} 
-                        className={`group bg-white border-2 overflow-hidden transition-all duration-300 relative ${
+                        className={`group bg-white border border-purple-100 overflow-hidden transition-all duration-200 relative ${
                           viewMode === 'grid' 
-                            ? 'rounded-2xl hover:shadow-xl hover:-translate-y-1' 
-                            : 'rounded-xl flex items-center p-4 hover:shadow-lg hover:scale-[1.02]'
+                            ? 'rounded-lg hover:shadow-md hover:-translate-y-0.5 hover:border-purple-300' 
+                            : 'rounded-lg flex items-center p-3 hover:shadow-md hover:scale-[1.01] hover:border-purple-300'
                         }`}
-                        style={{borderColor: '#FFE1E0'}}
                       >
                         {viewMode === 'grid' ? (
                           <>
-                            {/* Grid View */}
-                            <div className="relative h-40 sm:h-48 overflow-hidden" style={{backgroundColor: '#FFE1E0'}}>
-                              <ImageErrorBoundary alt={product.name} width={400} height={300}>
+                            {/* Grid View - Compact */}
+                            <div className="relative h-24 sm:h-28 overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50">
+                              <ImageErrorBoundary alt={product.name} width={200} height={120}>
                                 <SafeProductImage
                                   src={product.imageUrl}
                                   alt={product.name}
-                                  className="w-full h-full transition-transform duration-500 group-hover:scale-110"
-                                  width={400}
-                                  height={300}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  width={200}
+                                  height={120}
                                 />
                               </ImageErrorBoundary>
                               
                               {/* Status indicators */}
-                              <div className="absolute top-3 right-3 flex flex-col gap-2">
+                              <div className="absolute top-1.5 right-1.5 flex flex-col gap-1">
                                 {!product.isActive && (
-                                  <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-semibold shadow-lg">
+                                  <span className="bg-gray-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
                                     Inactive
                                   </span>
                                 )}
-                                <span className="text-white text-xs px-2 py-1 rounded-full font-semibold shadow-lg backdrop-blur-sm" style={{backgroundColor: 'rgba(127, 85, 177, 0.9)'}}>
-                                  {product.stockQty} left
+                                <span className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
+                                  {product.stockQty}
                                 </span>
                               </div>
 
                               {/* Category badge */}
-                              <div className="absolute top-3 left-3">
-                                <span className="bg-white/95 backdrop-blur-sm text-xs px-2 py-1 rounded-full font-semibold shadow-lg" style={{color: '#7F55B1'}}>
-                                  {product.category}
+                              <div className="absolute top-1.5 left-1.5">
+                                <span className="bg-white/90 text-purple-700 text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
+                                  {product.category.slice(0, 3)}
                                 </span>
                               </div>
                             </div>
 
-                            {/* Product Info */}
-                            <div className="p-4">
-                              <h3 className="font-semibold mb-2 text-sm sm:text-base leading-tight line-clamp-2" style={{color: '#7F55B1'}}>
+                            {/* Product Info - Compact */}
+                            <div className="p-2.5">
+                              <h3 className="font-medium mb-1.5 text-xs leading-tight line-clamp-2 text-gray-800 min-h-[2rem]">
                                 {product.name}
                               </h3>
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-lg sm:text-xl font-bold" style={{color: '#7F55B1'}}>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-bold text-purple-700">
                                   ${product.price.toFixed(2)}
                                 </span>
-                                <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
                                   product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                 }`}>
                                   {product.isActive ? 'Active' : 'Inactive'}
                                 </span>
                               </div>
                               
-                              {/* Action Buttons */}
-                              <div className="flex space-x-2">
+                              {/* Action Buttons - Compact */}
+                              <div className="flex gap-1">
                                 <button
                                   onClick={() => openEditModal(product)}
-                                  className="flex-1 py-2 px-3 rounded-lg text-white text-sm font-medium active:scale-95 transition-all duration-200 shadow-sm"
-                                  style={{backgroundColor: '#F49BAB'}}
+                                  className="flex-1 bg-purple-600 text-white px-2 py-1.5 rounded-md hover:bg-purple-700 transition-all duration-200 active:scale-95 text-xs font-medium"
                                 >
                                   Edit
                                 </button>
                                 <button
                                   onClick={() => handleDelete(product)}
-                                  className="px-3 py-2 rounded-lg bg-red-500 text-white text-sm font-medium active:scale-95 transition-all duration-200 shadow-sm"
+                                  className="flex-1 bg-red-500 text-white px-2 py-1.5 rounded-md hover:bg-red-600 transition-all duration-200 active:scale-95 text-xs font-medium"
                                 >
                                   Delete
                                 </button>
@@ -388,61 +421,58 @@ export default function AdminPage() {
                           </>
                         ) : (
                           <>
-                            {/* List View */}
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 mr-4" style={{backgroundColor: '#FFE1E0'}}>
-                              <ImageErrorBoundary alt={product.name} width={80} height={80}>
+                            {/* List View - Compact */}
+                            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 mr-3 bg-gradient-to-br from-purple-50 to-pink-50">
+                              <ImageErrorBoundary alt={product.name} width={64} height={64}>
                                 <SafeProductImage
                                   src={product.imageUrl}
                                   alt={product.name}
                                   className="w-full h-full object-cover"
-                                  width={80}
-                                  height={80}
+                                  width={64}
+                                  height={64}
                                 />
                               </ImageErrorBoundary>
                             </div>
                             
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between mb-2">
-                                <div>
-                                  <h3 className="font-semibold text-base sm:text-lg truncate" style={{color: '#7F55B1'}}>
-                                    {product.name}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-xs px-2 py-1 rounded-full" style={{backgroundColor: '#FFE1E0', color: '#7F55B1'}}>
-                                      {product.category}
-                                    </span>
-                                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                                      product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                    }`}>
-                                      {product.isActive ? 'Active' : 'Inactive'}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div className="text-right ml-4">
-                                  <div className="text-xl sm:text-2xl font-bold" style={{color: '#7F55B1'}}>
-                                    ${product.price.toFixed(2)}
-                                  </div>
-                                  <div className="text-sm text-gray-600">
-                                    {product.stockQty} in stock
-                                  </div>
-                                </div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-medium text-sm truncate text-gray-800">
+                                  {product.name}
+                                </h3>
+                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 flex-shrink-0">
+                                  {product.category.slice(0, 3)}
+                                </span>
+                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 ${
+                                  product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                }`}>
+                                  {product.isActive ? 'Active' : 'Inactive'}
+                                </span>
                               </div>
-                              
-                              {/* Action Buttons */}
-                              <div className="flex space-x-2 mt-3">
-                                <button
-                                  onClick={() => openEditModal(product)}
-                                  className="flex-1 py-2 px-4 rounded-lg text-white text-sm font-medium active:scale-95 transition-all duration-200 shadow-sm"
-                                  style={{backgroundColor: '#F49BAB'}}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(product)}
-                                  className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium active:scale-95 transition-all duration-200 shadow-sm"
-                                >
-                                  Delete
-                                </button>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg font-bold text-purple-700">
+                                    ${product.price.toFixed(2)}
+                                  </span>
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                                    {product.stockQty} in stock
+                                  </span>
+                                </div>
+                                
+                                {/* Action Buttons */}
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => openEditModal(product)}
+                                    className="bg-purple-600 text-white px-3 py-1.5 rounded-md hover:bg-purple-700 transition-all duration-200 active:scale-95 text-xs font-medium"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(product)}
+                                    className="bg-red-500 text-white px-3 py-1.5 rounded-md hover:bg-red-600 transition-all duration-200 active:scale-95 text-xs font-medium"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </>

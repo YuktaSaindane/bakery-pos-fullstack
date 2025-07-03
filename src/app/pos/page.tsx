@@ -308,8 +308,8 @@ export default function POSPage() {
             {/* Products Section */}
             <div className="lg:col-span-3">
               {/* Search and Filters - Mobile Optimized */}
-              <div className="bg-white rounded-2xl shadow-sm border-2 p-4 sm:p-6 mb-4 sm:mb-6" style={{borderColor: '#F49BAB'}}>
-                <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-200 p-3 sm:p-4 mb-4">
+                <div className="flex flex-col gap-2 sm:gap-3">
                   {/* Search Bar */}
                   <div className="relative">
                     <input
@@ -317,30 +317,21 @@ export default function POSPage() {
                       placeholder="Search products..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 text-lg border-2 rounded-xl focus:ring-2 focus:border-transparent transition-all"
-                      style={{
-                        borderColor: '#F49BAB',
-                        '--tw-ring-color': '#9B7EBD'
-                      }}
+                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white/70 backdrop-blur-sm"
                     />
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2" style={{color: '#9B7EBD'}}>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     </div>
                   </div>
                   
                   {/* Category Filter + View Mode Toggle */}
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="flex-1 px-4 py-4 text-lg border-2 rounded-xl focus:ring-2 focus:border-transparent bg-white transition-all"
-                      style={{
-                        borderColor: '#F49BAB',
-                        '--tw-ring-color': '#9B7EBD',
-                        color: '#7F55B1'
-                      }}
+                      className="flex-1 px-3 py-2.5 text-sm border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white/70 backdrop-blur-sm text-purple-700"
                     >
                       <option value="all">All Categories</option>
                       {PRODUCT_CATEGORIES.map(category => (
@@ -349,22 +340,20 @@ export default function POSPage() {
                     </select>
                     
                     {/* View Mode Toggle */}
-                    <div className="flex rounded-xl border-2 overflow-hidden" style={{borderColor: '#F49BAB'}}>
+                    <div className="flex rounded-lg border border-purple-200 overflow-hidden bg-white/70">
                       <button
                         onClick={() => setViewMode('grid')}
-                        className={`px-4 py-4 transition-all ${viewMode === 'grid' ? 'text-white' : 'text-gray-600'}`}
-                        style={{backgroundColor: viewMode === 'grid' ? '#7F55B1' : 'white'}}
+                        className={`px-3 py-2.5 transition-all ${viewMode === 'grid' ? 'bg-purple-600 text-white' : 'text-purple-600 hover:bg-purple-50'}`}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
                       </button>
                       <button
                         onClick={() => setViewMode('list')}
-                        className={`px-4 py-4 transition-all ${viewMode === 'list' ? 'text-white' : 'text-gray-600'}`}
-                        style={{backgroundColor: viewMode === 'list' ? '#7F55B1' : 'white'}}
+                        className={`px-3 py-2.5 transition-all ${viewMode === 'list' ? 'bg-purple-600 text-white' : 'text-purple-600 hover:bg-purple-50'}`}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                       </button>
@@ -374,89 +363,82 @@ export default function POSPage() {
               </div>
 
               {/* Products Grid/List */}
-              <div className="bg-white rounded-2xl shadow-sm border-2 p-4 sm:p-6" style={{borderColor: '#F49BAB'}}>
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-purple-200 p-3 sm:p-4">
                 {loading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent" style={{borderTopColor: '#7F55B1'}}></div>
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-600 border-t-transparent"></div>
                   </div>
                 ) : filteredProducts.length === 0 ? (
-                  <div className="text-center py-20">
-                    <div className="text-8xl mb-4">🔍</div>
-                    <p className="text-2xl font-bold" style={{color: '#9B7EBD'}}>No products found</p>
+                  <div className="text-center py-12">
+                    <div className="text-4xl mb-3">🔍</div>
+                    <p className="text-lg font-semibold text-gray-600">No products found</p>
                   </div>
                 ) : (
                   <div className={viewMode === 'grid' 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" 
-                    : "space-y-3"
+                    ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" 
+                    : "space-y-2"
                   }>
                     {filteredProducts.map(product => (
                       <div 
                         key={product.id} 
-                        className={`group bg-white border-2 overflow-hidden transition-all duration-300 relative ${
+                        className={`group bg-white border border-purple-100 overflow-hidden transition-all duration-200 relative ${
                           product.isActive 
-                            ? 'hover:shadow-xl cursor-pointer active:scale-95' 
-                            : 'opacity-50 cursor-not-allowed grayscale'
+                            ? 'hover:shadow-md cursor-pointer active:scale-95 hover:border-purple-300' 
+                            : 'opacity-60 cursor-not-allowed grayscale'
                         } ${
                           viewMode === 'grid' 
-                            ? 'rounded-2xl hover:-translate-y-1' 
-                            : 'rounded-xl flex items-center p-4 hover:scale-[1.02]'
+                            ? 'rounded-lg hover:-translate-y-0.5' 
+                            : 'rounded-lg flex items-center p-3 hover:scale-[1.01]'
                         }`}
-                        style={{borderColor: '#FFE1E0'}}
                         onClick={() => product.isActive && addToCart(product)}
                       >
                         {viewMode === 'grid' ? (
                           <>
-                            {/* Grid View - Product Image */}
-                            <div className="relative h-40 sm:h-48 overflow-hidden" style={{backgroundColor: '#FFE1E0'}}>
-                              <ImageErrorBoundary alt={product.name} width={400} height={300}>
+                            {/* Grid View - Compact Product Image */}
+                            <div className="relative h-24 sm:h-28 overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50">
+                              <ImageErrorBoundary alt={product.name} width={200} height={120}>
                                 <SafeProductImage
                                   src={product.imageUrl}
                                   alt={product.name}
-                                  className={`w-full h-full transition-transform duration-500 ${
-                                    product.isActive ? 'group-hover:scale-110' : ''
+                                  className={`w-full h-full object-cover transition-transform duration-300 ${
+                                    product.isActive ? 'group-hover:scale-105' : ''
                                   }`}
-                                  width={400}
-                                  height={300}
+                                  width={200}
+                                  height={120}
                                 />
                               </ImageErrorBoundary>
                               
-                              {/* Status indicators */}
-                              <div className="absolute top-3 right-3 flex flex-col gap-2">
-                                {!product.isActive && (
-                                  <span className="bg-gray-500 text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg">
-                                    Inactive
-                                  </span>
-                                )}
+                              {/* Compact Status indicators */}
+                              <div className="absolute top-1.5 right-1.5">
                                 {product.stockQty > 0 ? (
-                                  <span className="text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg backdrop-blur-sm" style={{backgroundColor: 'rgba(127, 85, 177, 0.9)'}}>
+                                  <span className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
                                     {product.stockQty}
                                   </span>
                                 ) : (
-                                  <span className="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg">
-                                    Out of Stock
+                                  <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
+                                    0
                                   </span>
                                 )}
                               </div>
 
                               {/* Category badge */}
-                              <div className="absolute top-3 left-3">
-                                <span className="bg-white/95 backdrop-blur-sm text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg" style={{color: '#7F55B1'}}>
-                                  {product.category}
+                              <div className="absolute top-1.5 left-1.5">
+                                <span className="bg-white/90 text-purple-700 text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
+                                  {product.category.slice(0, 3)}
                                 </span>
                               </div>
 
                               {/* Quick add button overlay */}
                               {product.stockQty > 0 && product.isActive && (
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 bg-black/20">
                                   <button 
-                                    className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-xl transform scale-90 group-hover:scale-100 transition-all duration-300"
-                                    style={{backgroundColor: '#7F55B1'}}
+                                    className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       addToCart(product);
                                     }}
                                   >
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
                                   </button>
@@ -464,35 +446,33 @@ export default function POSPage() {
                               )}
                             </div>
 
-                            {/* Grid View - Product Info */}
-                            <div className="p-4">
-                              <h3 className="font-semibold mb-3 text-sm sm:text-base leading-tight line-clamp-2 min-h-[2.5rem]" style={{color: '#7F55B1'}}>
+                            {/* Grid View - Compact Product Info */}
+                            <div className="p-2.5">
+                              <h3 className="font-medium mb-1.5 text-xs leading-tight line-clamp-2 text-gray-800 min-h-[2rem]">
                                 {product.name}
                               </h3>
                               <div className="flex items-center justify-between">
-                                <span className="text-xl sm:text-2xl font-bold" style={{color: '#7F55B1'}}>
+                                <span className="text-sm font-bold text-purple-700">
                                   ${product.price.toFixed(2)}
                                 </span>
                                 {product.stockQty > 0 && product.isActive ? (
                                   <button 
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white transition-all duration-200 active:scale-90 shadow-lg"
-                                    style={{backgroundColor: '#7F55B1'}}
+                                    className="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-white transition-all duration-200 active:scale-90 shadow-sm hover:bg-purple-700"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       addToCart(product);
                                     }}
                                   >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H17M17 13v0a1.65 1.65 0 00-3 0v0a1.65 1.65 0 00-3 0v0a1.65 1.65 0 00-3 0v0a1.65 1.65 0 00-3 0v0" />
                                     </svg>
                                   </button>
                                 ) : (
                                   <button 
                                     disabled
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white cursor-not-allowed"
-                                    style={{backgroundColor: '#9B7EBD', opacity: 0.5}}
+                                    className="w-7 h-7 rounded-lg bg-gray-300 flex items-center justify-center text-gray-500 cursor-not-allowed"
                                   >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                   </button>
@@ -502,63 +482,61 @@ export default function POSPage() {
                           </>
                         ) : (
                           <>
-                            {/* List View */}
-                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 mr-4" style={{backgroundColor: '#FFE1E0'}}>
-                              <ImageErrorBoundary alt={product.name} width={80} height={80}>
+                            {/* List View - Compact */}
+                            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 mr-3 bg-gradient-to-br from-purple-50 to-pink-50">
+                              <ImageErrorBoundary alt={product.name} width={64} height={64}>
                                 <SafeProductImage
                                   src={product.imageUrl}
                                   alt={product.name}
                                   className="w-full h-full object-cover"
-                                  width={80}
-                                  height={80}
+                                  width={64}
+                                  height={64}
                                 />
                               </ImageErrorBoundary>
                             </div>
                             
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-lg truncate" style={{color: '#7F55B1'}}>
+                                <h3 className="font-medium text-sm truncate text-gray-800">
                                   {product.name}
                                 </h3>
-                                <span className="text-xs px-2 py-1 rounded-full" style={{backgroundColor: '#FFE1E0', color: '#7F55B1'}}>
-                                  {product.category}
+                                <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 flex-shrink-0">
+                                  {product.category.slice(0, 3)}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between">
-                                <span className="text-2xl font-bold" style={{color: '#7F55B1'}}>
+                                <span className="text-lg font-bold text-purple-700">
                                   ${product.price.toFixed(2)}
                                 </span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                   {product.stockQty > 0 ? (
-                                    <span className="text-sm px-2 py-1 rounded-full" style={{backgroundColor: '#7F55B1', color: 'white'}}>
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                                       {product.stockQty} left
                                     </span>
                                   ) : (
-                                    <span className="text-sm px-2 py-1 rounded-full bg-red-500 text-white">
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
                                       Sold Out
                                     </span>
                                   )}
                                   
                                   {product.stockQty > 0 && product.isActive ? (
                                     <button 
-                                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white transition-all duration-200 active:scale-90 shadow-lg"
-                                      style={{backgroundColor: '#7F55B1'}}
+                                      className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center text-white transition-all duration-200 active:scale-90 shadow-sm hover:bg-purple-700"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         addToCart(product);
                                       }}
                                     >
-                                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                       </svg>
                                     </button>
                                   ) : (
                                     <button 
                                       disabled
-                                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white cursor-not-allowed"
-                                      style={{backgroundColor: '#9B7EBD', opacity: 0.5}}
+                                      className="w-8 h-8 rounded-lg bg-gray-300 flex items-center justify-center text-gray-500 cursor-not-allowed"
                                     >
-                                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                       </svg>
                                     </button>
@@ -571,15 +549,15 @@ export default function POSPage() {
 
                         {/* Overlays for different states */}
                         {!product.isActive && (
-                          <div className="absolute inset-0 bg-gray-900/30 flex items-center justify-center rounded-2xl">
-                            <span className="text-white font-bold text-lg px-4 py-2 rounded-xl bg-gray-600/90">
+                          <div className="absolute inset-0 bg-gray-900/20 flex items-center justify-center rounded-lg">
+                            <span className="text-gray-600 font-medium text-xs px-2 py-1 rounded bg-white/90">
                               INACTIVE
                             </span>
                           </div>
                         )}
                         {product.stockQty <= 0 && product.isActive && (
-                          <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center rounded-2xl">
-                            <span className="text-white font-bold text-lg px-4 py-2 rounded-xl" style={{backgroundColor: 'rgba(239, 68, 68, 0.9)'}}>
+                          <div className="absolute inset-0 bg-gray-900/30 flex items-center justify-center rounded-lg">
+                            <span className="text-white font-medium text-xs px-2 py-1 rounded bg-red-500/90">
                               SOLD OUT
                             </span>
                           </div>
