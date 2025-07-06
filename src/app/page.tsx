@@ -33,43 +33,101 @@ export default function HomePage() {
       <AuthHeader />
 
       {/* Hero Section */}
-      <main className="relative max-w-7xl mx-auto px-6 py-20">
+      <main className="relative max-w-7xl mx-auto px-6 py-24">
         {/* Hero Content */}
-        <div className="text-center mb-20">
-          {/* Logo/Icon */}
-          <div className="relative mb-8">
-            <div className="w-32 h-32 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-purple-600 via-pink-500 to-purple-700 flex items-center justify-center shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
-              <div className="text-white">
-                <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9C9 10.1 9.9 11 11 11V12.5C11 13.3 11.7 14 12.5 14S14 13.3 14 12.5V11C15.1 11 16 10.1 16 9V9H21ZM7 22H17C18.1 22 19 21.1 19 20V19H5V20C5 21.1 5.9 22 7 22Z"/>
-                </svg>
-              </div>
-              {/* Decorative dots */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full"></div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-pink-400 rounded-full"></div>
+        <div className="text-center mb-24">
+          {/* Fresh Daily Badge */}
+          <div className="inline-flex items-center bg-white/90 backdrop-blur-sm border border-orange-200 text-orange-600 px-5 py-2 rounded-full text-sm font-medium shadow-sm mb-12">
+            <span className="text-orange-500 mr-2">✨</span>
+            Fresh Daily
+          </div>
+
+          {/* Main Content Container */}
+          <div className="max-w-5xl mx-auto">
+            {/* Main Title */}
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-none">
+              <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-purple-700 bg-clip-text text-transparent">
+                PopStreet
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 bg-clip-text text-transparent">
+                Bakes
+              </span>
+            </h1>
+            
+            {/* Subtitle */}
+            <div className="mb-12">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-4">
+                Modern Bakery POS System
+              </h2>
+              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Streamline your bakery operations with our modern, intuitive point-of-sale system designed for efficiency and ease.
+              </p>
             </div>
             
-            {/* Floating badges */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce">
-                ✨ Fresh Daily
+            {/* Key Features */}
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
+              <div className="group p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-purple-100 hover:border-purple-200 transition-all duration-300 hover:shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Manage Orders</h3>
+                <p className="text-sm text-gray-600">Process transactions quickly and efficiently</p>
+              </div>
+              
+              <div className="group p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-pink-100 hover:border-pink-200 transition-all duration-300 hover:shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Track Inventory</h3>
+                <p className="text-sm text-gray-600">Real-time stock monitoring and alerts</p>
+              </div>
+              
+              <div className="group p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Serve Customers</h3>
+                <p className="text-sm text-gray-600">Deliver exceptional customer experiences</p>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              {isAuthenticated ? (
+                <Link
+                  href="/pos"
+                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H17" />
+                  </svg>
+                  Start Taking Orders
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
+                  </svg>
+                  Get Started
+                </Link>
+              )}
+              
+              <div className="flex items-center text-sm text-gray-500">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                Trusted by local bakeries
               </div>
             </div>
           </div>
-
-          <h1 className="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-purple-700 via-pink-600 to-purple-800 bg-clip-text text-transparent leading-tight">
-            PopStreet Bakes
-          </h1>
-          <h2 className="text-xl md:text-2xl font-bold mb-8 text-gray-700">
-            Modern Bakery POS System
-          </h2>
-          <p className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed text-gray-600 mb-8">
-            Streamline your bakery operations with our modern, intuitive point-of-sale system. 
-            <br />
-            <span className="font-semibold text-purple-700">Manage orders • Track inventory • Serve customers efficiently</span>
-          </p>
-
-
         </div>
 
         {/* Welcome Message for Authenticated Users */}
