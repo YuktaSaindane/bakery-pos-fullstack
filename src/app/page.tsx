@@ -21,12 +21,84 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
-      {/* Decorative Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 relative overflow-hidden">
+      {/* Enhanced Decorative Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-200 to-purple-200 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-200 to-indigo-200 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-gradient-to-br from-pink-300 to-purple-300 rounded-full opacity-10 blur-2xl"></div>
+        {/* Large gradient blobs - More visible */}
+        <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-pink-300 to-purple-300 rounded-full opacity-40 blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-gradient-to-br from-purple-300 to-indigo-300 rounded-full opacity-35 blur-3xl"></div>
+        <div className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full opacity-30 blur-2xl"></div>
+        
+        {/* Floating bakery items - Much more visible */}
+        <div className="absolute top-16 left-16 opacity-50 animate-float">
+          <div className="w-12 h-12 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full shadow-lg"></div>
+        </div>
+        
+        <div className="absolute top-32 right-16 opacity-50 animate-float-delayed">
+          <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg shadow-lg"></div>
+        </div>
+        
+        <div className="absolute top-48 left-32 opacity-50 animate-float">
+          <div className="w-8 h-8 bg-gradient-to-br from-purple-300 to-purple-400 rounded-full shadow-lg"></div>
+        </div>
+        
+        <div className="absolute top-64 right-32 opacity-45 animate-float-slow">
+          <div className="w-6 h-6 bg-gradient-to-br from-indigo-300 to-indigo-400 rounded-lg shadow-lg"></div>
+        </div>
+        
+        <div className="absolute top-80 left-48 opacity-50 animate-float-delayed">
+          <div className="w-14 h-14 bg-gradient-to-br from-yellow-300 to-yellow-400 rounded-full shadow-lg"></div>
+        </div>
+
+        {/* Middle section elements */}
+        <div className="absolute top-96 right-48 opacity-45 animate-float-slow">
+          <div className="w-7 h-7 bg-gradient-to-br from-rose-300 to-rose-400 rounded-full shadow-lg"></div>
+        </div>
+        
+        <div className="absolute top-112 left-64 opacity-45 animate-float">
+          <div className="w-5 h-5 bg-gradient-to-br from-cyan-300 to-cyan-400 rounded-lg shadow-lg"></div>
+        </div>
+
+        <div className="absolute top-128 right-64 opacity-50 animate-float-delayed">
+          <div className="w-9 h-9 bg-gradient-to-br from-emerald-300 to-emerald-400 rounded-full shadow-lg"></div>
+        </div>
+
+        <div className="absolute top-144 left-80 opacity-45 animate-float-slow">
+          <div className="w-11 h-11 bg-gradient-to-br from-amber-300 to-amber-400 rounded-lg shadow-lg"></div>
+        </div>
+
+        <div className="absolute top-160 right-80 opacity-50 animate-float">
+          <div className="w-6 h-6 bg-gradient-to-br from-violet-300 to-violet-400 rounded-full shadow-lg"></div>
+        </div>
+
+        {/* Bottom section elements */}
+        <div className="absolute bottom-32 left-16 opacity-50 animate-float-delayed">
+          <div className="w-8 h-8 bg-gradient-to-br from-red-300 to-red-400 rounded-full shadow-lg"></div>
+        </div>
+
+        <div className="absolute bottom-48 right-16 opacity-45 animate-float-slow">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-300 to-blue-400 rounded-lg shadow-lg"></div>
+        </div>
+
+        <div className="absolute bottom-64 left-32 opacity-50 animate-float">
+          <div className="w-7 h-7 bg-gradient-to-br from-green-300 to-green-400 rounded-full shadow-lg"></div>
+        </div>
+
+        <div className="absolute bottom-80 right-32 opacity-45 animate-float-delayed">
+          <div className="w-12 h-12 bg-gradient-to-br from-teal-300 to-teal-400 rounded-lg shadow-lg"></div>
+        </div>
+
+        {/* Geometric patterns - More visible */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
+          <div className="absolute top-24 left-1/4 w-16 h-16 border-3 border-purple-400 rounded-full"></div>
+          <div className="absolute bottom-24 left-1/6 w-12 h-12 border-3 border-pink-400 rounded-lg rotate-45"></div>
+          <div className="absolute top-1/3 right-1/4 w-14 h-14 border-3 border-indigo-400 rounded-full"></div>
+          <div className="absolute bottom-1/3 right-1/6 w-10 h-10 border-3 border-orange-400 rounded-lg rotate-12"></div>
+        </div>
+
+        {/* Subtle gradient overlays - More visible */}
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-bl from-purple-200/50 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-pink-200/50 to-transparent"></div>
       </div>
 
       {/* Use Auth Header */}
