@@ -3,7 +3,7 @@
 A lightweight Point-of-Sale web application tailored for PopStreet Bakes bakery. Built with Next.js, TypeScript, Tailwind CSS, Express.js, and PostgreSQL.
 
 ## 🎥 Demo
-![Demo](https://i.imgur.com/3uYwBFe.gif)
+![PopStreet POS Demo](https://i.imgur.com/3uYwBFe.gif)
 ## 🚀 Features
 
 ### POS System (Staff Interface)
