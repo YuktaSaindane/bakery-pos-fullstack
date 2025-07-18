@@ -4,9 +4,6 @@ A lightweight Point-of-Sale web application tailored for PopStreet Bakes bakery.
 
 ## 🎥 Demo
 ![Demo](https://i.imgur.com/3uYwBFe.gif)
-
-
-
 ## 🚀 Features
 
 ### POS System (Staff Interface)
