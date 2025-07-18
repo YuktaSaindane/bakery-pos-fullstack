@@ -1,8 +1,9 @@
 # PopStreet Bakes MiniPOS
 
 A lightweight Point-of-Sale web application tailored for PopStreet Bakes bakery. Built with Next.js, TypeScript, Tailwind CSS, Express.js, and PostgreSQL.
-## 🎥 Demo Video
-![Demo GIF](https://imgur.com/a/XsTYZYs.gif)
+
+[Watch demo video](https://i.imgur.com/zgEMwlt.mp4)
+
 
 ## 🚀 Features
 
